@@ -25,7 +25,7 @@ def parseTime(time_str):
 def processNginx():
     nginx_obj = nginxParse()
     i = 1
-    with open(nginx_file, encoding="utf-8") as f:
+    with open(nginx_file, encoding="utf-8", errors='ignore') as f:
         for line in f:
             line = line.strip("\n")
             print("\rProcess Nginx: {0}".format(i), end="")
@@ -43,7 +43,7 @@ def processNginx():
 
 def processDPC():
     i = 1
-    with open(dpc_file, encoding="utf-8") as f:
+    with open(dpc_file, encoding="utf-8", errors='ignore') as f:
         for line in f:
             print("\rProcess DPC: {0}".format(i), end="")
             i += 1
