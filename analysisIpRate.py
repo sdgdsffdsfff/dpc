@@ -10,9 +10,12 @@ output_file = 'output/IpRate.txt'
 ipObj = ipCompare()
 
 ip_pool = {}
+total_dpc_line = 0
+total_nginx_line = 0
 
 
 def processDPC(ip_addr):
+    global ip_pool
 
     ip_net = ipObj.parsePrivateIP(ip_addr)
 
@@ -27,6 +30,7 @@ def processDPC(ip_addr):
         ip_pool[ip_net] = item
 
 def processNginx(ip_addr):
+    global ip_pool
 
     ip_net = ipObj.transPublicIP(ip_addr)
 
@@ -48,6 +52,7 @@ def processNginx(ip_addr):
 def generatePoolReuslt():
     file_str = ""
     print_str = ""
+    global ip_pool, total_dpc_line, total_nginx_line
 
     for item in ip_pool:
         success_num = ip_pool[item]['success']
@@ -57,9 +62,17 @@ def generatePoolReuslt():
             ratio = str(ratio) + "%"
         else:
             ratio = "0"
-        file_str += "{0}\t{1}\t{2}\t{3}\n".format(str(item), success_num, total_num, ratio)
-        print_str += "%20s %8s %8s %8s\n" % (str(item),success_num, total_num, ratio)
 
+        # Generate file str
+        file_str += "{0}\t{1}\t{2}\t{3}\n".format(str(item), success_num, total_num, ratio)
+
+        # Generate print str
+        if success_num >= 5 or total_num >=5:
+            print_str += "%20s %8s %8s %8s\n" % (str(item),success_num, total_num, ratio)
+
+    print("----------------")
+    print("total: {0}\tsuccess: {1}\tratio: {2}%".
+          format(total_dpc_line,total_nginx_line,round(total_nginx_line/total_dpc_line*100,1)))
     print("----------------")
     print(print_str)
     print("----------------")
@@ -71,25 +84,25 @@ def generatePoolReuslt():
 
 
 def main():
-    i = 1
-    with open(dpc_file, encoding="utf-8") as f:
+    global total_dpc_line, total_nginx_line
+
+    with open(dpc_file, encoding="utf-8", errors='ignore') as f:
         for line in f:
+            total_dpc_line += 1
             line = line.strip('\n')
             ip_addr = line.split('\t')[1]
-            print("\r Process DPC: {0} IP: {1}".format(i, ip_addr), end="")
+            print("\r Process DPC: {0} IP: {1}".format(total_dpc_line, ip_addr), end="")
             processDPC(ip_addr)
-            i += 1
 
     print("\n")
-    i = 1
 
-    with open(nginx_file, encoding="utf-8") as f:
+    with open(nginx_file, encoding="utf-8", errors='ignore') as f:
         for line in f:
+            total_nginx_line += 1
             line = line.strip('\n')
             ip_addr = line.split(' ')[0]
-            print("\r Process Nginx: {0} IP: {1}".format(i, ip_addr), end="")
+            print("\r Process Nginx: {0} IP: {1}".format(total_nginx_line, ip_addr), end="")
             processNginx(ip_addr)
-            i += 1
 
     print("\n")
 
