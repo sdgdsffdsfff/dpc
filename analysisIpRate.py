@@ -49,7 +49,14 @@ def writePoolFile():
     file_str = ""
 
     for item in ip_pool:
-        file_str += "{0}\t{1}\t{2}\n".format(str(item), ip_pool[item]['success'], ip_pool[item]['total'])
+        success_num = ip_pool[item]['success']
+        total_num = ip_pool[item]['total']
+        if total_num != 0 and success_num != 0:
+            ratio = round(success_num / total_num *100, 1)
+            ratio = str(ratio) + "%"
+        else:
+            ratio = "0"
+        file_str += "{0}\t{1}\t{2}\t{3}\n".format(str(item), success_num, total_num, ratio)
 
     with open(output_file, 'w+') as f:
         f.write(file_str)
