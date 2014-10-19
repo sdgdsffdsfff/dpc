@@ -45,8 +45,9 @@ def processNginx(ip_addr):
         item = {'total' : 0, 'success' : 1}
         ip_pool[ip_net] = item
 
-def writePoolFile():
+def generatePoolReuslt():
     file_str = ""
+    print_str = ""
 
     for item in ip_pool:
         success_num = ip_pool[item]['success']
@@ -57,6 +58,11 @@ def writePoolFile():
         else:
             ratio = "0"
         file_str += "{0}\t{1}\t{2}\t{3}\n".format(str(item), success_num, total_num, ratio)
+        print_str += "%20s %8s %8s %8s\n" % (str(item),success_num, total_num, ratio)
+
+    print("----------------")
+    print(print_str)
+    print("----------------")
 
     with open(output_file, 'w+') as f:
         f.write(file_str)
@@ -87,7 +93,7 @@ def main():
 
     print("\n")
 
-    writePoolFile()
+    generatePoolReuslt()
 
 
 if __name__ == '__main__':
